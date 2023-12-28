@@ -4,6 +4,7 @@ import * as dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./mongodb/connectDB.js";
 import registerRoute from "./routes/registerRoute.js";
+import loginRoute from "./routes/loginRoute.js";
 
 dotenv.config();
 const PORT = 3000;
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan("tiny"));
 app.use("/api/v1/register", registerRoute);
+app.use("/api/v1/login", loginRoute);
 
 app.get("/", (req, res) => {
   res.status(200).json("hello from server");
