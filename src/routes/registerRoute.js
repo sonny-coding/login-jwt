@@ -7,16 +7,8 @@ const router = express.Router();
 router.route("/").post(async (req, res) => {
   try {
     const { username, password } = req.body;
-    console.log(
-      "🚀 ~ file: registerRoute.js:10 ~ router.route ~ username:",
-      username
-    );
-
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(
-      "🚀 ~ file: registerRoute.js:13 ~ router.route ~ hashedPassword:",
-      hashedPassword
-    );
+
     const newUser = new userModel({
       username: username,
       password: hashedPassword,

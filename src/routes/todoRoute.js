@@ -6,8 +6,8 @@ const router = express.Router();
 // get todos
 router.route("/").get(async (req, res) => {
   try {
-    const { username } = req.body;
-    const todos = await todoModel.find({ username });
+    const { uid } = req.body;
+    const todos = await todoModel.find({ uid });
     if (!todos) {
       throw new Error("Cannot get todo(s)");
     }
@@ -19,14 +19,24 @@ router.route("/").get(async (req, res) => {
 // update todo
 router.route("/").patch(async (req, res) => {
   try {
-    const { id, isFinished } = req.body;
+    const { id, uid, isFinished } = req.body;
     const todo = await todoModel.findOne({ _id: id });
-    todo.isFinished = isFinished;
-    const updatedTodo = await todo.save();
-    if (!updatedTodo) {
-      throw new Error("Cannot update todo");
+    if (!todo) {
+      res.status(404).json({ success: false, message: "cannot find todo" });
     }
-    res.status(201).json(updatedTodo);
+    if (id === uid) {
+      todo.isFinished = isFinished;
+      const updatedTodo = await todo.save();
+      if (!updatedTodo) {
+        throw new Error("Cannot update todo");
+      }
+      res.status(201).json(updatedTodo);
+    } else {
+      return (401).json({
+        success: false,
+        message: "not authenticated to update",
+      });
+    }
   } catch (error) {
     res.status(500).json({ message: error });
   }
@@ -34,9 +44,10 @@ router.route("/").patch(async (req, res) => {
 // create todo
 router.route("/").post(async (req, res) => {
   try {
-    const { username, task } = req.body;
+    // CREATE A NOTHER FIELD WITH USERID (UID) = USER._ID
+    const { uid, task } = req.body;
     const newTodo = new todoModel({
-      username: username,
+      uid: uid,
       task: task,
       isFinished: false,
     });
@@ -53,7 +64,16 @@ router.route("/").post(async (req, res) => {
 // delete todo
 router.route("/").delete(async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id, uid } = req.body;
+    if (id === uid) {
+      res
+        .status(401)
+        .json({ success: false, message: "not allowed to delete todo" });
+    }
+    const todo = await todoModel.findOne(id);
+    if (!todo) {
+      res.status(404).json({ success: false, message: "cannot find" });
+    }
     const deletedTodo = await todoModel.findByIdAndDelete(id);
     if (!deletedTodo) {
       throw new Error("Not found");

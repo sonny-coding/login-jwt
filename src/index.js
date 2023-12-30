@@ -6,6 +6,7 @@ import connectDB from "./mongodb/connectDB.js";
 import registerRoute from "./routes/registerRoute.js";
 import loginRoute from "./routes/loginRoute.js";
 import todoRoute from "./routes/todoRoute.js";
+import isLoggedIn from "./middleware/isLoggedIn.js";
 
 dotenv.config();
 const PORT = 3000;

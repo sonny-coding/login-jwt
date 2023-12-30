@@ -18,7 +18,8 @@ router.route("/").post(async (req, res) => {
   const mysecretkey = process.env.SECRET_CODE;
   const payload = {
     username: user.username,
-    password: user.password,
+    // password: user.password,
+    uid: user._id,
   };
   const token = jwt.sign(payload, mysecretkey, { expiresIn: "5d" });
   res.status(200).json({
